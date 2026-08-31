@@ -1,7 +1,6 @@
-# Boilerplate Flutter & Laravel com Docker
+# Festou Docker Runtime
 
-Este repositório agora usa a topologia root/docker vNext extraída do Belluga
-Now, mas sem manter identidade Belluga hardcoded na base genérica.
+Este repositório orquestra o runtime Docker da Festou a partir da topologia root/docker vNext do boilerplate Belluga, com configuração downstream via env e GitHub variables/secrets.
 
 ## O que a base espera
 
@@ -20,6 +19,14 @@ assume que o projeto downstream já entrega o shell web em `web-app/`.
 - `cloudflared` é opcional via profile `local-tunnel`.
 - `certbot` continua restrito ao profile `production`.
 
+## Ambiente dev da Festou
+
+- Domínio público dev: `festoudemo.site`.
+- Variável GitHub do repo Docker: `DOMAIN=festoudemo.site`.
+- Segredo GitHub do repo Docker: `CLOUDFLARE_TUNNEL_TOKEN`.
+- Segredo local: `.env.local.tunnel`, criado a partir de `.env.local.tunnel.example` e nunca commitado.
+- Gitlinks de submódulos são objetos de promoção; esta configuração não altera `.gitmodules` nem pins.
+
 ## Setup rápido
 
 1. Copie o ambiente base:
@@ -28,7 +35,7 @@ assume que o projeto downstream já entrega o shell web em `web-app/`.
 cp .env.example .env
 ```
 
-2. Ajuste pelo menos `PROJECT_NAME`, `PROJECT_PREFIX`, `DOMAIN` e `CERTBOT_EMAIL`.
+2. Para dev, `PROJECT_NAME`, `PROJECT_PREFIX` e `DOMAIN` já apontam para Festou (`festou`, `festou`, `festoudemo.site`). Ajuste `CERTBOT_EMAIL` apenas quando ativar o profile `production`.
 
 3. Garanta que o downstream já forneça `laravel-app/` e `web-app/`.
 
@@ -43,10 +50,11 @@ cp .env.local.tunnel.example .env.local.tunnel
 
 `CLOUDFLARE_TUNNEL_TOKEN` fica apenas em `.env.local.tunnel`, não em `.env.example`.
 
+Para Festou dev, o tunnel publico canonico e `https://festoudemo.site`. O DNS pode levar alguns minutos para refletir alteracoes recentes; isso nao muda a configuracao esperada do repo.
+
 ### Domínio landlord e hosts tenant
 
-`DOMAIN` e `laravel-app/.env:APP_URL` representam o mesmo domínio raiz do
-landlord, por exemplo `yourdomain.com` e `https://yourdomain.com`.
+`DOMAIN` e `laravel-app/.env:APP_URL` representam o mesmo domínio raiz do landlord. No dev da Festou, use `DOMAIN=festoudemo.site` no Docker e `APP_URL=https://festoudemo.site` no Laravel.
 `APP_URL` não deve receber o hostname de um tenant.
 
 O host de um tenant é resolvido separadamente pelo registro no banco:
