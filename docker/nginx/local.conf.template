@@ -169,6 +169,7 @@ server {
 
     location ^~ /storage/ {
         alias /var/www/storage/app/public/;
+        try_files $request_filename =404;
         expires 1y;
         add_header Cache-Control "public";
         add_header X-Content-Type-Options nosniff;
@@ -176,15 +177,21 @@ server {
     }
 
     location = / {
-        try_files /__tenant_public_shell__ /index.php?$query_string;
+        root /opt/web-shell;
+        try_files /index.html =404;
+        add_header Cache-Control "no-cache" always;
     }
 
     location = /open-app {
-        try_files /__tenant_public_shell__ /index.php?$query_string;
+        root /opt/web-shell;
+        try_files /index.html =404;
+        add_header Cache-Control "no-cache" always;
     }
 
     location = /privacy-policy {
-        try_files /__tenant_public_shell__ /index.php?$query_string;
+        root /opt/web-shell;
+        try_files /index.html =404;
+        add_header Cache-Control "no-cache" always;
     }
 
     include /etc/nginx/project/*.conf;
